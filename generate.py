@@ -43,13 +43,13 @@ for app_id in os.listdir(top):
         kv = shlex.split(line.decode())
         if kv[0].startswith("application-label:"):
             metadata["label"] = kv[0].split(":")[1]
-        else if kv[0].startswith("uses-static-library: name"):
-            metadata["depends-on"].append(kv[0].split("=")[1])
+        elif kv[0].startswith("uses-static-library:"):
+            metadata["depends-on"].append(kv[1].split("=")[1])
             break # This portion appears later than the application-label
 
     if (app_id == "com.google.android.gms"):
         metadata["depends-on"] = ["com.google.android.gsf"]
-    else if (app_id == "com.android.vending"):
+    elif (app_id == "com.android.vending"):
         metadata["depends-on"] = ["com.google.android.gsf", "com.google.android.gms"]
 
     app_dir = os.path.join("apps", "packages", app_id, str(version_code))
