@@ -18,7 +18,7 @@ shutil.copy("apps.0.pub", "apps")
 apps = {}
 
 for app_id in os.listdir(top):
-    metadata = {"label": "", "versionCode": -1, "depends-on": [], "packages": [], "hashes": []}
+    metadata = {"label": "", "versionCode": -1, "minApiVersion": 31, "depends-on": [], "packages": [], "hashes": []}
     apps[app_id] = {"stable": metadata}
 
     src_dir = os.path.join(top, app_id)
@@ -41,7 +41,11 @@ for app_id in os.listdir(top):
 
     for line in lines[1:-1]:
         kv = shlex.split(line.decode())
-        if kv[0].startswith("application-label:"):
+        # The closest one that allows for streaming for multiple android versions is sdkVersion (minSdk)
+        # (for Google Services compatibility layer, this will determine what versions should be fetched)
+        if kv[0].startswith("sdkVersion:"):
+            metadata["minApiVersion"] = int(kv[0].split(":")[1])
+        elif kv[0].startswith("application-label:"):
             metadata["label"] = kv[0].split(":")[1]
         elif kv[0].startswith("uses-static-library:"):
             metadata["depends-on"].append(kv[1].split("=")[1])
