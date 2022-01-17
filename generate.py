@@ -45,7 +45,6 @@ for app_id in os.listdir(top):
             metadata["label"] = kv[0].split(":")[1]
         elif kv[0].startswith("uses-static-library:"):
             metadata["dependencies"].append(kv[1].split("=")[1])
-            break # This portion appears later than the application-label
 
     if (app_id == "com.google.android.gms"):
         metadata["dependencies"] = ["com.google.android.gsf"]
