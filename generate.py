@@ -14,12 +14,15 @@ top = "extracted-apps"
 shutil.rmtree("apps", ignore_errors=True)
 os.mkdir("apps")
 shutil.copy("apps.0.pub", "apps")
+google_apps =  ["com.google.android.gsf", "com.google.android.gms", "com.android.vending"]
 
 apps = {}
 
 for app_id in os.listdir(top):
-    metadata = {"label": "", "versionCode": -1, "dependencies": [], "packages": [], "hashes": []}
+    metadata = {"label": "", "versionCode": -1, "targetApi": 31, "hardEnforceTargetApi": false, "dependencies": [], "packages": [], "hashes": []}
     apps[app_id] = {"stable": metadata}
+    if app_id in google_apps:
+        metadata["hardEnforceTargetApi"] = true
 
     src_dir = os.path.join(top, app_id)
     src_packages = os.listdir(src_dir)
@@ -41,7 +44,9 @@ for app_id in os.listdir(top):
 
     for line in lines[1:-1]:
         kv = shlex.split(line.decode())
-        if kv[0].startswith("application-label:"):
+        if kv[0].startswith("targetSdkVersion:"):
+            metadata["targetApi"] = kv[0].split(":")[1]
+        elif kv[0].startswith("application-label:"):
             metadata["label"] = kv[0].split(":")[1]
         elif kv[0].startswith("uses-static-library:"):
             metadata["dependencies"].append(kv[1].split("=")[1])
